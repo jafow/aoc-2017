@@ -19,7 +19,36 @@ The system's full passphrase list is available as your puzzle input. How many
 passphrases are valid?
 """
 
+def valid_passphrases(f):
+    """ return a sum of all unique words in a file object f """
+    # read all lines from text.IO
+    lines = f.readlines()
+    xs = list(filter(all_unique, list_lines(lines)))
+    print(len(list(xs)))
+    return len(xs)
 
+
+def all_unique(line):
+    """ returns True if line contains all unique words, False if not """
+    return len(list(line)) == len(set(line))
+
+def list_lines(file_object):
+    return map(split_strip, file_object)
+
+
+def split_strip(line):
+    """ map a line from a file object to a list of 'words' split on (not necessarily uniform!) spaces """
+    return filter(lambda x: x != '', line.strip().split(' '))
+
+q = open('./test/4mock.txt')
+valid_passphrases(q)
+# print(list(list_lines(q)))
+q.close()
+# f = open('./input/4.txt')
+# v = valid_passphrases(f)
+# f.close()
+
+# print(v)
 # read each line
 
 # make a trie!
@@ -30,24 +59,18 @@ passphrases are valid?
 # return uniq(list)
 
 # Tests
-class TestSpiralOut(unittest.TestCase):
-    def test_square_one_to_itself(self):
-        self.assertEqual()
+class TestCountUniqueWords(unittest.TestCase):
 
-    def test_counts_from_point_around_a_corner(self):
-        self.assertEqual()
-        self.assertEqual()
-        self.assertEqual()
-        self.assertEqual()
+    def test_only_counts_unique_words(self):
+        mock = open('./test/4mock.txt')
+        self.assertEqual(valid_passphrases(mock), 1)
+        mock.close()
 
-    def test_counts_from_diagonal(self):
-        self.assertEqual()
-        self.assertEqual()
-
-    def test_large_distance(self):
-        self.assertEqual()
-        self.assertEqual()
+    # def test_only_counts_one_for_lines_with_filled_repeats(self):
+    #     mock_1 = open('./test/4_1mock.txt')
+    #     self.assertEqual(valid_passphrases(mock_1), 3)
+    #     mock_1.close()
 
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
