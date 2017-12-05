@@ -30,7 +30,8 @@ def list_lines(file_object):
 
 
 def split_strip(line):
-    """ map a line from a file object to a list of 'words' split on (not necessarily uniform!) spaces """
+    """ map a line from a file object to a list of 'words' split on (not
+    necessarily uniform!) spaces """
     return list(filter(lambda x: x != '', line.strip().split(' ')))
 
 
@@ -41,9 +42,11 @@ def valid_passphrases(f):
     f.close()
     return len(xs)
 
+
 f = open('./input/4.txt')
 v = valid_passphrases(f)
 print('Result: {}'.format(v))
+
 
 # Tests
 class TestCountUniqueWords(unittest.TestCase):
