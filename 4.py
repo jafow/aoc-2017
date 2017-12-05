@@ -19,18 +19,11 @@ The system's full passphrase list is available as your puzzle input. How many
 passphrases are valid?
 """
 
-def valid_passphrases(f):
-    """ return a sum of all unique words in a file object f """
-    # read all lines from text.IO
-    lines = f.readlines()
-    xs = list(filter(all_unique, list_lines(lines)))
-    print(len(list(xs)))
-    return len(xs)
-
 
 def all_unique(line):
     """ returns True if line contains all unique words, False if not """
     return len(list(line)) == len(set(line))
+
 
 def list_lines(file_object):
     return map(split_strip, file_object)
@@ -38,39 +31,35 @@ def list_lines(file_object):
 
 def split_strip(line):
     """ map a line from a file object to a list of 'words' split on (not necessarily uniform!) spaces """
-    return filter(lambda x: x != '', line.strip().split(' '))
+    return list(filter(lambda x: x != '', line.strip().split(' ')))
 
-q = open('./test/4mock.txt')
-valid_passphrases(q)
-# print(list(list_lines(q)))
-q.close()
-# f = open('./input/4.txt')
-# v = valid_passphrases(f)
-# f.close()
 
-# print(v)
-# read each line
+def valid_passphrases(f):
+    """ return a sum of all unique words in a file object f """
+    lines = f.readlines()
+    xs = list(filter(all_unique, list_lines(lines)))
+    f.close()
+    return len(xs)
 
-# make a trie!
-
-# brute force?
-# read each line in as a set
-# split on the word, sort
-# return uniq(list)
+f = open('./input/4.txt')
+v = valid_passphrases(f)
+print('Result: {}'.format(v))
 
 # Tests
 class TestCountUniqueWords(unittest.TestCase):
 
+    def test_should_count_all_when_every_line_is_unique(self):
+        mock_2 = open('./test/4_0mock.txt')
+        self.assertEqual(valid_passphrases(mock_2), 6)
+
+    def test_only_counts_one_for_lines_with_filled_repeats(self):
+        mock_1 = open('./test/4_1mock.txt')
+        self.assertEqual(valid_passphrases(mock_1), 3)
+
     def test_only_counts_unique_words(self):
-        mock = open('./test/4mock.txt')
-        self.assertEqual(valid_passphrases(mock), 1)
-        mock.close()
-
-    # def test_only_counts_one_for_lines_with_filled_repeats(self):
-    #     mock_1 = open('./test/4_1mock.txt')
-    #     self.assertEqual(valid_passphrases(mock_1), 3)
-    #     mock_1.close()
+        mock = open('./test/4_2mock.txt')
+        self.assertEqual(valid_passphrases(mock), 2)
 
 
-# if __name__ == '__main__':
-#     unittest.main()
+if __name__ == '__main__':
+    unittest.main()
