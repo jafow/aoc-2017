@@ -1,5 +1,4 @@
 import unittest
-import pdb
 import utils as u
 
 """
@@ -58,46 +57,57 @@ def redist_cycles(B):
     """ take a list `B` of ints and return the sum of redist cycles """
     state = list(map(int, u.split_strip(B)))
     seen = set()
-    L = len(state) - 1
-    # pdb.set_trace()
+    L = len(state)
     cycles = 0
     i = 0
+    running = True
+    matched_state = str()
+    loops = dict()
 
-    while True:
-        print('hit')
-        if str(state) in seen:
-            return 1
-        elif i == L:
-            i = 0
-            cycles += 1
-            yield cycles
+    while running is True:
+        if str(state) == matched_state:
+            running = False
+            return cycles - loops['first']
+
         else:
+            if seen is not None and str(state) in seen:
+                loops['first'] = cycles
+                matched_state = str(state)
+                seen = None
+
+            if seen is not None:
+                seen.add(str(state))
+
             # redistribute
             max_idx, max_val = max(enumerate(state), key=lambda x: x[1])
             state[max_idx] = 0
 
             # reset i if max_idx is at end of list
-            if max_idx == L:
+            if max_idx >= L - 1:
                 i = 0
             else:
                 i = max_idx + 1
 
             for j in range(0, max_val):
-                if i == L:
-                    i = 0
-
                 state[i] += 1
-                i += 1
+                if i + 1 >= L:
+                    i = 0
+                else:
+                    i += 1
 
-            seen.add(str(state))
             cycles += 1
-            yield cycles
+
+    return cycles
+
+
+print(redist_cycles(INPUT))
 
 
 class TestDay6(unittest.TestCase):
     def test_should_count_jumps(self):
-        c = sum(x for x in redist_cycles('0  2   7  0'))
-        self.assertEqual(c, 5)
+        # c = sum(x for x in redist_cycles('0  2   7  0'))
+        c = redist_cycles('0  2   7  0')
+        self.assertEqual(c, 4)
 
 
 if __name__ == '__main__':
