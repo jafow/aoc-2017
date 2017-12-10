@@ -66,7 +66,6 @@ balancing in front of you is much larger.)
 Before you're ready to help them, you need to make sure your information is
 correct. What is the name of the bottom program?
 """
-import unittest
 from utils import split_strip as sstrip
 
 # build dict of all program names P and their weights we will use to do lookup
@@ -87,20 +86,20 @@ def lowest_tower(t):
     return 'b'
 
 
-def node_weight(node):
-    """ return the weight of a node and its child nodes (if any) """
-    w = node.get('weight')
-    if 'children' not in node:
-        return w
-    else:
-        w += sum(node_weight(child) for child in node['children'])
-        return w
-
-
 def main():
-    f = open('./input/7_mock.txt')
+    f = open('./input/7.txt')
     P_TABLE = dict()
-    C_SET = set()
+    C_SET = dict()
+
+    def node_weight(node):
+        """ return the weight of a node and its child nodes (if any) """
+        if node not in C_SET:
+            # has no children so return node weight from lookup table
+            return P_TABLE.get(node)
+        else:
+            return sum(
+                    (node_weight(x) for x in C_SET[node]['children'])
+                    )
 
     for line in f.readlines():
         split_line = list(sstrip(line))
@@ -111,33 +110,18 @@ def main():
         if len(split_line) > 2:
             # has children so add to TABLE and C_SET
             c = map(decomma, split_line[3:])
-            node = (name,  weight, c)
-            C_SET.add(node)
+            C_SET[name] = {'weight': weight, 'children': c}
+
+    k = [
+            {
+                'name': key,
+                'weight': sum([node_weight(c) for c in node['children']])
+                }
+            for key, node in C_SET.items()
+            ]
+
+    xx = max(k, key=lambda x: x['weight'])
+    return xx
 
 
-class TestDay7(unittest.TestCase):
-    def test_returns_weight_of_self_and_children(self):
-        x = {'name': 'x', 'weight': 1}
-        y = {'name': 'y', 'weight': 0}
-        z = {'name': 'z', 'weight': 2}
-        a = {'name': 'a', 'weight': -4}
-        c = {'name': 'c', 'weight': 7, 'children': [a]}
-        k = {'name': 'k', 'weight': 6, 'children': [c]}
-        j = {'name': 'j', 'weight': 4, 'children': [k, z, y, x]}
-        self.assertEqual(node_weight(k), 9)
-        self.assertEqual(node_weight(j), 16)
-
-    def test_returns_weight_for_mulitple_levels(self):
-        x = {'name': 'x', 'weight': 1}
-        y = {'name': 'y', 'weight': 0}
-        z = {'name': 'z', 'weight': 2}
-        a = {'name': 'a', 'weight': -4}
-        c = {'name': 'c', 'weight': 7, 'children': [a]}
-        k = {'name': 'k', 'weight': 6, 'children': [c]}
-        j = {'name': 'j', 'weight': 4, 'children': [k, z, y, x]}
-
-        self.assertEqual(node_weight(j), 16)
-
-
-if __name__ == '__main__':
-    unittest.main()
+main()
