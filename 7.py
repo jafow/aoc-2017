@@ -124,4 +124,72 @@ def main():
     return xx
 
 
-main()
+# main()
+ 
+
+""" part 2: """
+
+
+from collections import OrderedDict
+
+
+def main2():
+    f = open('./input/7_mock.txt')
+    lines = f.readlines()
+    f.close()
+    P_TABLE = OrderedDict()
+    C_SET = OrderedDict()
+
+    def not_balanced(node):
+        if node not in C_SET:
+            # has no children so return node weight from lookup table
+            return False
+        else:
+            C = {P_TABLE[x] for x in C_SET[node]['children']}
+            L = len(C)
+            if L > 1:
+                w = [(c, P_TABLE[c]) for c in C]
+                print(w)
+                return True
+
+            return False
+
+    def node_weight(node):
+        """ return the weight of a node and its child nodes (if any) """
+        if node not in C_SET:
+            # has no children so return node weight from lookup table
+            return P_TABLE.get(node)
+        elif not_balanced(node):
+            print('PPP: ', node)
+            return P_TABLE.get(node)
+        else:
+            # cc = {P_TABLE.get(c) for c in C_SET[node]['children']}
+            return sum(
+                    (node_weight(x) for x in C_SET[node]['children'])
+                    )
+
+    for line in lines:
+        split_line = list(sstrip(line))
+        name = split_line[0]
+        weight = deparen(split_line[1])
+        P_TABLE.setdefault(name, weight)
+
+        if len(split_line) > 2:
+            # has children so add to TABLE and C_SET
+            c = map(decomma, split_line[3:])
+            C_SET[name] = {'weight': weight, 'children': c}
+
+    k = [
+            {
+                'name': key,
+                'weight': ([node_weight(c) for c in node['children']])
+                }
+            for key, node in C_SET.items()
+            ]
+
+    xx = max(k, key=lambda x: x['weight'])
+    print('K: ', xx)
+    # return xx
+
+
+main2()
