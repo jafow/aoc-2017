@@ -104,15 +104,12 @@ def main():
     L = LIST
 
     for count, size in enumerate(LENGTHS):
-        if size == 0:
-            size = 1
-
         chunk = sl(L, start_idx, size)
         L = reverse_chunk(L, start_idx, chunk)
         start_idx = (start_idx + size + count) % len(L)
 
     [r1, r2] = L[0:2]
-    print('res == {0}*{1} '.format(r1, r2))
+    print('res == {0}*{1} => {2}'.format(r1, r2, (r1 * r2)))
     return r1 * r2
 
 
