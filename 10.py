@@ -76,18 +76,72 @@ complete, what is the result of multiplying the first two numbers in the list?
 """
 
 INPUT = '129,154,49,198,200,133,97,254,41,6,2,1,255,0,191,108'
+# INPUT = '3, 4, 1, 5'
 
-LENGTHS = list(INPUT.split(','))
-SKIP_LIST = list(x for x in range(0, 256))
+LENGTHS = list(map(int, INPUT.split(',')))
+LIST = list(x for x in range(256))
+
+
+def reverse_chunk(L, start, chunk):
+    """
+    Given a list `chunk` and start index `start`,
+    create a copy of list L with values in chunk reversed in place at `start`
+    """
+    c = list(L)
+    r = reversed(chunk)
+
+    for chunk_idx, val in enumerate(r):
+        idx = (start + chunk_idx)
+        m = idx % len(c)
+        c[m] = val
+
+    return c
+
+
+def main():
+
+    start_idx = 0
+    L = LIST
+
+    for count, size in enumerate(LENGTHS):
+        if size == 0:
+            size = 1
+
+        chunk = sl(L, start_idx, size)
+        L = reverse_chunk(L, start_idx, chunk)
+        start_idx = (start_idx + size + count) % len(L)
+
+    [r1, r2] = L[0:2]
+    print('res == {0}*{1} '.format(r1, r2))
+    return r1 * r2
+
+
+main()
 
 
 class TestSliceWraps(unittest.TestCase):
     def test_slice_wraps_around_len(self):
         a = [3, 4, 5, 6, 7]
         self.assertEqual(sl(a, 3, 4), [6, 7, 3, 4])
-        self.assertEqual(sl(a, 0, 2), [3, 4])
+        self.assertEqual(sl(a, 0, 2), [3, 4], 'returns slice without wrapping')
         self.assertEqual(sl(a, 4, 5), [7, 3, 4, 5, 6])
         self.assertEqual(sl(a, 4, 1), [7])
+
+    def test_reverse_chunk_with_wrapping(self):
+        b = [3, 4, 5, 6, 7]
+        c = [10, 8, 6, 4, 3, 5, 7, 9, 11]
+        chunk = [6, 7, 3]
+        chunk1 = [6, 4, 5, 3]
+        chunk2 = [7, 9, 11, 10, 8, 6, 4, 3]
+
+        self.assertEqual(reverse_chunk(b, 3, chunk), [6, 4, 5, 3, 7])
+
+        self.assertEqual(reverse_chunk(b, 0, chunk1), [3, 5, 4, 6, 7])
+
+        self.assertEqual(
+                reverse_chunk(c, 6, chunk2), [8, 10, 11, 9, 7, 5, 3, 4, 6])
+
+        self.assertEqual(reverse_chunk(b, 4, [7]), [3, 4, 5, 6, 7])
 
 
 if __name__ == '__main__':
