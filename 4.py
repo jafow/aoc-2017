@@ -23,9 +23,16 @@ passphrases are valid?
 
 def all_unique_no_perms(line):
     """ returns True if line contains all unique words, False if not """
-    zz = [''.join(y) for x in line for y in perms(x) if y not in line]
-    print('zz: !', zz)
-    return len(zz) == 0
+    if all_unique(line) == False:
+        return False
+
+    for word in line:
+        p = [''.join(x) for x in perms(word)]
+        for pp in p:
+           if pp != word and pp in line:
+               return False
+
+    return True
 
 
 def all_unique(line):
@@ -56,17 +63,14 @@ def valid_passphrases_no_perms(f):
     lines = f.readlines()
     xs = list(filter(all_unique_no_perms, list_lines(lines)))
     f.close()
+    print('# of lines {0} and valid {1}'.format(len(lines), len(xs)))
     return len(xs)
 
 
 
-f = open('./input/4-mock.txt')
+f = open('./input/4.txt')
 v = valid_passphrases_no_perms(f)
 print('Result: {}'.format(v))
-
-# pt 2
-# for each word W in line L
-#   check that all permutations of the word are not in L
 
 # Tests
 class TestCountUniqueWords(unittest.TestCase):
