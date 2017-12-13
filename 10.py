@@ -1,5 +1,5 @@
 import unittest
-from utils import slice_len as sl
+from utils import slice_len as sl, split_strip
 """
 --- Day 10: Knot Hash ---
 
@@ -73,13 +73,38 @@ check the process, you can multiply them together to produce 12.
 However, you should instead use the standard list size of 256 (with values 0
 to 255) and the sequence of lengths in your puzzle input. Once this process is
 complete, what is the result of multiplying the first two numbers in the list?
+
+## part 2
+* convert INPUT to list of ascii values for each byte in INPUT and append this bytestring `17, 31, 73, 47, 23`
+to end of every line in INPUT.
+* run 64 rounds of `main` process, preserve the `start_idx` and `skip_size`
+for each round and use them at the start of the next round
+* the result is sparse_hash S; for each block B of 16 'bits',
+compress the DENSE_HASH D from S by xor each digit in S[B]
+    ie S = {12, 14, 6, 24, 2, 2} => D {12 ^ 14 ^ 6 ^ 24 ^ 2 ^ 2} = 28
+* last, convert D to hex string
 """
 
-INPUT = '129,154,49,198,200,133,97,254,41,6,2,1,255,0,191,108'
-# INPUT = '3, 4, 1, 5'
+# INPUT = '129,154,49,198,200,133,97,254,41,6,2,1,255,0,191,108'
+INPUT = '3, 4, 1, 5'
+INPUT_ASCII = '3,4,1,5,17,31,73,47,23'
 
 LENGTHS = list(map(int, INPUT.split(',')))
 LIST = list(x for x in range(256))
+CONST_LEN = [17, 31, 73, 47, 23]
+
+
+def string_to_list_of_ascii_codes(s):
+    """ map a string s to a list of ascii char codes """
+    return list(map(ord, s))
+
+
+def size_list_with_const(s):
+    """
+    given an input string s, return a list of ascii code values with the
+    constant values appended
+    """
+    return string_to_list_of_ascii_codes(s) + CONST_LEN
 
 
 def reverse_chunk(L, start, chunk):
@@ -98,12 +123,12 @@ def reverse_chunk(L, start, chunk):
     return c
 
 
-def main():
+def main(_input):
 
     start_idx = 0
     L = LIST
 
-    for count, size in enumerate(LENGTHS):
+    for count, size in enumerate(_input):
         chunk = sl(L, start_idx, size)
         L = reverse_chunk(L, start_idx, chunk)
         start_idx = (start_idx + size + count) % len(L)
@@ -113,7 +138,32 @@ def main():
     return r1 * r2
 
 
-main()
+def reverse_chunk_through_list(size_list, L, count, start):
+    for size in size_list:
+        chunk = sl(L, start, size)
+        L = reverse_chunk(L, start, chunk)
+        start = (start + size + count) % len(L)
+        count += 1
+
+    return (start, count, L)
+
+
+def sparse_hash(_input):
+    """ take an input string _input and return a list of N (256) of values
+    made of values of 0 to N-1.
+    """
+    start_idx = 0
+    L = LIST
+
+    for i in range(64):
+        start_idx, idx, L = reverse_chunk_through_list(_input, L, i, start_idx)
+
+    print('L {}'.format(L))
+
+# pt1
+# main(LENGTHS)
+# pt2
+sparse_hash(size_list_with_const(INPUT))
 
 
 class TestSliceWraps(unittest.TestCase):
@@ -139,6 +189,26 @@ class TestSliceWraps(unittest.TestCase):
                 reverse_chunk(c, 6, chunk2), [8, 10, 11, 9, 7, 5, 3, 4, 6])
 
         self.assertEqual(reverse_chunk(b, 4, [7]), [3, 4, 5, 6, 7])
+
+
+class TestStringToAscii(unittest.TestCase):
+    def test_maps_str_to_ascii_ints(self):
+        x = '3,4,1,5'
+        self.assertEqual(
+                string_to_list_of_ascii_codes(x),
+                [51, 44, 52, 44, 49, 44, 53]
+                )
+        self.assertEqual(
+                string_to_list_of_ascii_codes('0,0,0,0'),
+                [48, 44, 48, 44, 48, 44, 48]
+                )
+
+    def test_appends_const_list_to_ascii_string(self):
+        x = '1,2,3'
+        self.assertEqual(
+                size_list_with_const(x),
+                [49, 44, 50, 44, 51, 17, 31, 73, 47, 23]
+                )
 
 
 if __name__ == '__main__':
