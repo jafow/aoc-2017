@@ -1,4 +1,5 @@
 import unittest
+from itertools import permutations as perms
 
 """
 --- Day 4: High-Entropy Passphrases ---
@@ -18,6 +19,13 @@ For example:
 The system's full passphrase list is available as your puzzle input. How many
 passphrases are valid?
 """
+
+
+def all_unique_no_perms(line):
+    """ returns True if line contains all unique words, False if not """
+    zz = [''.join(y) for x in line for y in perms(x) if y not in line]
+    print('zz: !', zz)
+    return len(zz) == 0
 
 
 def all_unique(line):
@@ -43,10 +51,22 @@ def valid_passphrases(f):
     return len(xs)
 
 
-f = open('./input/4.txt')
-v = valid_passphrases(f)
+def valid_passphrases_no_perms(f):
+    """ return a sum of all lines that contain no words that could be a perm in a file object f """
+    lines = f.readlines()
+    xs = list(filter(all_unique_no_perms, list_lines(lines)))
+    f.close()
+    return len(xs)
+
+
+
+f = open('./input/4-mock.txt')
+v = valid_passphrases_no_perms(f)
 print('Result: {}'.format(v))
 
+# pt 2
+# for each word W in line L
+#   check that all permutations of the word are not in L
 
 # Tests
 class TestCountUniqueWords(unittest.TestCase):

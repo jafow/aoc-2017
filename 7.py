@@ -40,21 +40,21 @@ cntj (57)
 like this:
 
                 gyxo
-              /     
+              /
          ugml - ebii
-       /      \     
+       /      \
       |         jptl
-      |        
+      |
       |         pbga
      /        /
 tknk --- padx - havc
      \        \
       |         qoyq
-      |             
+      |
       |         ktlj
-       \      /     
+       \      /
          fwft - cntj
-              \     
+              \
                 xhth
 
 In this example, tknk is at the bottom of the tower (the bottom program), and
@@ -125,7 +125,7 @@ def main():
 
 
 # main()
- 
+
 
 """ part 2: """
 

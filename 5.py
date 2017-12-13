@@ -63,7 +63,7 @@ def count_jumps(jump_list):
 
 f = open('./input/5.txt')
 INPUT = u.strip_readlines(f)
-lines = map(int, INPUT)
+lines = list(map(int, INPUT))
 print(count_jumps(lines))
 f.close()
 
