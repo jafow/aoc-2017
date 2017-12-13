@@ -79,7 +79,7 @@ def deparen(s):
 
 def decomma(s):
     """ remove comma from a string and cast as int """
-    return s.replace(',', '').replace('', '')
+    return s.replace(',', '')
 
 
 def lowest_tower(t):
@@ -125,7 +125,7 @@ def main():
 
 
 # main()
- 
+
 
 """ part 2: """
 
