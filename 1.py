@@ -1,4 +1,5 @@
 import unittest
+import math
 
 """
 The captcha requires you to review a sequence of digits (your puzzle input) and find the sum of all digits that match the next digit in the list. The list is circular, so the digit after the last digit is the first digit in the list.
@@ -31,6 +32,18 @@ def sum_all_matching_consecutive(digits):
     """ take a string of digits and return the sum of all consecutive matching digits; it counts if digits[0] matches digits[len - 1] """
     return sum([int(digits[x]) for x in range(0, len(digits) - 1) if digits[x] == digits[x + 1]]) + sum_matching(digits[0], digits[len(digits) - 1])
 
+def sum_match_halfway_around(digits):
+    total = 0
+    LEN = len(digits)
+
+    for num in range(0, len(digits)):
+        halfway = math.floor(LEN / 2)
+        half_index = (num + halfway) % LEN
+        if digits[num] == digits[half_index]:
+            total += int(digits[num])
+    return total
+
+
 
 # Tests
 class TestSumOfAllMatchingNeighboringDigits(unittest.TestCase):
@@ -53,12 +66,14 @@ class TestSumOfAllMatchingNeighboringDigits(unittest.TestCase):
         self.assertEqual(sum_all_matching_consecutive('110'), 1)
 
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
 
 
 def output():
     f = open('./input/1.txt')
     digits = f.read().strip()
-    print(sum_all_matching_consecutive(digits))
+    # print(sum_all_matching_consecutive(digits))
+    print(sum_match_halfway_around(digits))
+
 output()
