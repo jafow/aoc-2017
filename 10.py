@@ -85,9 +85,9 @@ compress the DENSE_HASH D from S by xor each digit in S[B]
 * last, convert D to hex string
 """
 
-# INPUT = '129,154,49,198,200,133,97,254,41,6,2,1,255,0,191,108'
-INPUT = '3, 4, 1, 5'
-INPUT_ASCII = '3,4,1,5,17,31,73,47,23'
+INPUT = '129,154,49,198,200,133,97,254,41,6,2,1,255,0,191,108'
+INPUT = '1,2,3'
+# INPUT_ASCII = '3,4,1,5,17,31,73,47,23'
 
 LENGTHS = list(map(int, INPUT.split(',')))
 LIST = list(x for x in range(256))
@@ -139,6 +139,7 @@ def main(_input):
 
 
 def reverse_chunk_through_list(size_list, L, count, start):
+    # print('count {0} start: {1}'.format(count, start))
     for size in size_list:
         chunk = sl(L, start, size)
         L = reverse_chunk(L, start, chunk)
@@ -158,12 +159,40 @@ def sparse_hash(_input):
     for i in range(64):
         start_idx, idx, L = reverse_chunk_through_list(_input, L, i, start_idx)
 
-    print('L {}'.format(L))
+    # print('L {}'.format(L))
+    return L
+
+
+def xor_list(L):
+    """ xor all ints in L to a single value """
+    res = 0
+    for p in L:
+        res ^= p
+    return res
+
+
+def dense_hash(L):
+    """ given a list of ints L compress every 16 elements into a single value
+    using XOR """
+    step = 16
+    xs = [L[i:i+step] for i in range(0, len(L), step)]
+    compressed = map(xor_list, xs)
+    return list(compressed)
+
+
+def ascii_to_hex(L):
+    """ given a list L of ints 0-255 convert them to hex and stringify """
+    return bytearray(L).hex()
+
 
 # pt1
 # main(LENGTHS)
 # pt2
-sparse_hash(size_list_with_const(INPUT))
+sparse = sparse_hash(size_list_with_const(INPUT))
+dense = dense_hash(sparse)
+print('dense {0} len {1}'.format(dense, len(dense)))
+res = ascii_to_hex(dense)
+print(res)
 
 
 class TestSliceWraps(unittest.TestCase):
@@ -210,6 +239,14 @@ class TestStringToAscii(unittest.TestCase):
                 [49, 44, 50, 44, 51, 17, 31, 73, 47, 23]
                 )
 
+    def test_xor_list_of_bits(self):
+        x = [65, 27, 9, 1, 4, 3, 40, 50, 91, 7, 6, 0, 2, 5, 68, 22]
+        self.assertEqual(xor_list(x), 64)
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_ascii_to_hex(self):
+        x = [64, 7, 255]
+        self.assertEqual(ascii_to_hex(x), '4007ff')
+
+
+# if __name__ == '__main__':
+#     unittest.main()
