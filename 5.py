@@ -55,7 +55,10 @@ def count_jumps(jump_list):
         curr = i
         next = i + jump_list[i]
         i = next
-        jump_list[curr] += 1
+        if jump_list[curr] < 3:
+            jump_list[curr] += 1
+        else:
+            jump_list[curr] -= 1
         steps += 1
 
     return steps
